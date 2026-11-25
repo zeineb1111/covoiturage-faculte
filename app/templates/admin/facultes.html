@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block titre %}Facultés - Administration{% endblock %}
+{% block contenu %}
+<h1 class="h3 mb-3">Facultés</h1>
+
+<div class="card mb-4"><div class="card-body">
+  <h2 class="h5">Ajouter une faculté</h2>
+  <form method="post" class="row g-2">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="col-md-5"><input class="form-control" name="nom" placeholder="Nom complet" required></div>
+    <div class="col-md-2"><input class="form-control" name="sigle" placeholder="Sigle"></div>
+    <div class="col-md-3"><input class="form-control" name="ville" placeholder="Ville"></div>
+    <div class="col-md-2"><button class="btn btn-primary w-100" type="submit">Ajouter</button></div>
+  </form>
+</div></div>
+
+<div class="table-responsive"><table class="table bg-white align-middle">
+  <thead><tr><th>Nom</th><th>Sigle</th><th>Ville</th><th></th></tr></thead>
+  <tbody>
+  {% for f in facultes %}
+    <tr>
+      <form method="post" action="{{ url_for('admin.modifier_faculte', faculte_id=f.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <td><input class="form-control form-control-sm" name="nom" value="{{ f.nom }}" required></td>
+        <td><input class="form-control form-control-sm" name="sigle" value="{{ f.sigle or '' }}"></td>
+        <td><input class="form-control form-control-sm" name="ville" value="{{ f.ville or '' }}"></td>
+        <td class="text-end"><button class="btn btn-sm btn-outline-primary" type="submit">Enregistrer</button></td>
+      </form>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table></div>
+{% endblock %}

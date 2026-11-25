@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% from "_macros.html" import badge_reservation, bouton_post %}
+{% block titre %}Mes réservations - Covoiturage Faculté{% endblock %}
+{% block contenu %}
+<h1 class="h3 mb-3">Mes réservations</h1>
+{% if reservations %}
+  <div class="table-responsive"><table class="table bg-white align-middle">
+    <thead><tr><th>Trajet</th><th>Départ</th><th>Conducteur</th><th>Statut</th><th></th></tr></thead>
+    <tbody>
+    {% for r in reservations %}
+      <tr>
+        <td><a href="{{ url_for('trajets.detail', trajet_id=r.trajet_id) }}">
+          {{ r.trajet.zone_depart }} &rarr; {{ r.trajet.faculte.sigle or r.trajet.faculte.nom }}</a></td>
+        <td>{{ r.trajet.date_depart.strftime('%d/%m/%Y') }} {{ r.trajet.heure_depart.strftime('%H:%M') }}</td>
+        <td>{{ r.trajet.conducteur.prenom }} {{ r.trajet.conducteur.nom }}</td>
+        <td>{{ badge_reservation(r.statut) }}</td>
+        <td class="text-end">
+          {% if r.statut.name in ('EN_ATTENTE', 'CONFIRMEE') %}
+            {{ bouton_post(url_for('reservations.annuler', reservation_id=r.id), 'Annuler', 'outline-danger',
+                           'Annuler cette réservation ?') }}
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+{% else %}
+  <div class="alert alert-info">Vous n'avez pas encore de réservation.
+    <a href="{{ url_for('trajets.recherche') }}">Rechercher un trajet</a></div>
+{% endif %}
+{% endblock %}

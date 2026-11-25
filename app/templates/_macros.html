@@ -1,0 +1,19 @@
+{# Petites pièces d'interface réutilisées dans plusieurs pages #}
+{% macro badge_trajet(statut) %}
+  {% set couleurs = {'OUVERT': 'success', 'COMPLET': 'warning', 'ANNULE': 'secondary', 'TERMINE': 'dark'} %}
+  <span class="badge text-bg-{{ couleurs[statut.name] }}">{{ statut.value }}</span>
+{% endmacro %}
+
+{% macro badge_reservation(statut) %}
+  {% set couleurs = {'EN_ATTENTE': 'warning', 'CONFIRMEE': 'success', 'REFUSEE': 'danger', 'ANNULEE': 'secondary'} %}
+  <span class="badge text-bg-{{ couleurs[statut.name] }}">{{ statut.value }}</span>
+{% endmacro %}
+
+{# Bouton qui envoie un formulaire POST protégé par le jeton CSRF #}
+{% macro bouton_post(url, texte, style='primary', confirmation='') %}
+  <form method="post" action="{{ url }}" class="d-inline"
+        {% if confirmation %}onsubmit="return confirm('{{ confirmation }}');"{% endif %}>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit" class="btn btn-sm btn-{{ style }}">{{ texte }}</button>
+  </form>
+{% endmacro %}

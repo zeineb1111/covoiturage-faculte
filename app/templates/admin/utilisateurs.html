@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% from "_macros.html" import bouton_post %}
+{% block titre %}Comptes - Administration{% endblock %}
+{% block contenu %}
+<h1 class="h3 mb-3">Comptes</h1>
+<div class="table-responsive"><table class="table bg-white align-middle">
+  <thead><tr><th>Nom</th><th>E-mail</th><th>Faculté</th><th>Statut</th><th></th></tr></thead>
+  <tbody>
+  {% for u in utilisateurs %}
+    <tr>
+      <td>{{ u.prenom }} {{ u.nom }}{% if u.est_admin %} <span class="badge text-bg-dark">admin</span>{% endif %}</td>
+      <td>{{ u.email }}</td>
+      <td>{{ u.faculte.sigle if u.faculte else '-' }}</td>
+      <td>{{ u.statut_compte }}</td>
+      <td class="text-end">
+        {% if not u.est_admin %}
+          {{ bouton_post(url_for('admin.changer_statut', utilisateur_id=u.id),
+                         'Suspendre' if u.statut_compte == 'actif' else 'Réactiver',
+                         'outline-danger' if u.statut_compte == 'actif' else 'outline-success') }}
+        {% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table></div>
+{% endblock %}

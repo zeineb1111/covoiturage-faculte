@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block titre %}{{ 'Modifier' if trajet else 'Publier' }} un trajet - Covoiturage Faculté{% endblock %}
+{% block contenu %}
+<div class="row justify-content-center"><div class="col-md-7">
+  <div class="card"><div class="card-body">
+    <h1 class="h4 mb-3">{{ 'Modifier le trajet' if trajet else 'Publier un trajet' }}</h1>
+    <form method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="mb-3">
+        <label class="form-label">Faculté de destination</label>
+        <select class="form-select" name="faculte_id" required>
+          {% for f in facultes %}
+            {% set choisie = trajet.faculte_id if trajet else current_user.faculte_id %}
+            <option value="{{ f.id }}" {% if f.id == choisie %}selected{% endif %}>{{ f }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Zone de départ</label>
+        <input class="form-control" name="zone_depart" maxlength="80" required
+               value="{{ trajet.zone_depart if trajet else '' }}" placeholder="ex. El Mourouj">
+      </div>
+      <div class="row">
+        <div class="col-md-6 mb-3"><label class="form-label">Date</label>
+          <input class="form-control" type="date" name="date_depart" min="{{ aujourdhui }}" required
+                 value="{{ trajet.date_depart.isoformat() if trajet else '' }}"></div>
+        <div class="col-md-6 mb-3"><label class="form-label">Heure</label>
+          <input class="form-control" type="time" name="heure_depart" required
+                 value="{{ trajet.heure_depart.strftime('%H:%M') if trajet else '' }}"></div>
+      </div>
+      <div class="row">
+        <div class="col-md-6 mb-3"><label class="form-label">Nombre de places</label>
+          <input class="form-control" type="number" name="places_total" min="1" max="8" required
+                 value="{{ trajet.places_total if trajet else 3 }}"></div>
+        <div class="col-md-6 mb-3"><label class="form-label">Prix par place (DT)</label>
+          <input class="form-control" name="prix" required
+                 value="{{ trajet.prix if trajet else '2.0' }}"></div>
+      </div>
+      <button class="btn btn-primary" type="submit">{{ 'Enregistrer' if trajet else 'Publier le trajet' }}</button>
+      <a class="btn btn-outline-secondary" href="{{ url_for('trajets.mes_trajets') }}">Retour</a>
+    </form>
+  </div></div>
+</div></div>
+{% endblock %}

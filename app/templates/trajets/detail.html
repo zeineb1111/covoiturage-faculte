@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% from "_macros.html" import badge_trajet, badge_reservation, bouton_post %}
+{% block titre %}Trajet - Covoiturage Faculté{% endblock %}
+{% block contenu %}
+<div class="card mb-4"><div class="card-body">
+  <div class="d-flex justify-content-between align-items-start">
+    <h1 class="h4">{{ trajet.zone_depart }} &rarr; {{ trajet.faculte }}</h1>
+    {{ badge_trajet(trajet.statut) }}
+  </div>
+  <p class="mb-1"><strong>Départ :</strong> {{ trajet.date_depart.strftime('%d/%m/%Y') }} à {{ trajet.heure_depart.strftime('%H:%M') }}</p>
+  <p class="mb-1"><strong>Conducteur :</strong> {{ trajet.conducteur.prenom }} {{ trajet.conducteur.nom }}
+    {% if trajet.conducteur.note_moyenne() %}<span class="badge text-bg-info">&#9733; {{ trajet.conducteur.note_moyenne() }}/5</span>{% endif %}</p>
+  <p class="mb-1"><strong>Prix :</strong> {{ '%.2f'|format(trajet.prix) }} DT par place</p>
+  <p class="mb-3"><strong>Places :</strong> {{ trajet.places_restantes() }} restante(s) sur {{ trajet.places_total }}</p>
+
+  {% if est_conducteur %}
+    {% if trajet.statut in (StatutTrajet.OUVERT, StatutTrajet.COMPLET) and trajet.est_passe() %}
+      {{ bouton_post(url_for('trajets.terminer', trajet_id=trajet.id), 'Marquer comme terminé', 'success') }}
+    {% endif %}
+    {% if trajet.statut in (StatutTrajet.OUVERT, StatutTrajet.COMPLET) %}
+      <a class="btn btn-outline-primary btn-sm" href="{{ url_for('trajets.modifier', trajet_id=trajet.id) }}">Modifier</a>
+      {{ bouton_post(url_for('trajets.annuler', trajet_id=trajet.id), 'Annuler le trajet', 'outline-danger',
+                     "Annuler ce trajet et toutes ses réservations ?") }}
+    {% endif %}
+  {% elif not current_user.is_authenticated %}
+    <a class="btn btn-primary" href="{{ url_for('auth.connexion') }}">Connectez-vous pour réserver</a>
+  {% elif reservation and reservation.statut != StatutReservation.ANNULEE %}
+    <p class="mb-0">Votre demande : {{ badge_reservation(reservation.statut) }}</p>
+  {% elif trajet.statut == StatutTrajet.OUVERT %}
+    {{ bouton_post(url_for('reservations.reserver', trajet_id=trajet.id), 'Réserver une place', 'primary') }}
+  {% endif %}
+</div></div>
+
+{% if evaluables %}
+  <div class="card mb-4"><div class="card-body">
+    <h2 class="h5">Laisser un avis</h2>
+    {% for personne in evaluables %}
+      <form method="post" action="{{ url_for('avis.noter', trajet_id=trajet.id) }}" class="row g-2 align-items-end mb-2">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="destinataire_id" value="{{ personne.id }}">
+        <div class="col-md-3"><strong>{{ personne.prenom }} {{ personne.nom }}</strong></div>
+        <div class="col-md-2">
+          <select class="form-select form-select-sm" name="note" required>
+            <option value="" disabled selected>Note</option>
+            {% for n in range(5, 0, -1) %}<option value="{{ n }}">{{ n }} / 5</option>{% endfor %}
+          </select>
+        </div>
+        <div class="col-md-5"><input class="form-control form-control-sm" name="commentaire" maxlength="500" placeholder="Commentaire (facultatif)"></div>
+        <div class="col-md-2"><button class="btn btn-sm btn-primary w-100" type="submit">Publier</button></div>
+      </form>
+    {% endfor %}
+  </div></div>
+{% endif %}
+
+{% if trajet.avis %}
+  <h2 class="h5">Avis sur ce trajet</h2>
+  <ul class="list-group mb-4">
+    {% for a in trajet.avis %}
+      <li class="list-group-item">
+        <strong>{{ a.auteur.prenom }}</strong> &rarr; {{ a.destinataire.prenom }} : &#9733; {{ a.note }}/5
+        {% if a.commentaire %}<div class="text-muted">{{ a.commentaire }}</div>{% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+{% if est_conducteur %}
+  <h2 class="h5">Demandes de réservation</h2>
+  {% if trajet.reservations %}
+    <div class="table-responsive"><table class="table table-sm bg-white align-middle">
+      <thead><tr><th>Passager</th><th>Date de la demande</th><th>Statut</th><th></th></tr></thead>
+      <tbody>
+      {% for r in trajet.reservations %}
+        <tr>
+          <td>{{ r.passager.prenom }} {{ r.passager.nom }}</td>
+          <td>{{ r.date_demande.strftime('%d/%m/%Y %H:%M') }}</td>
+          <td>{{ badge_reservation(r.statut) }}</td>
+          <td class="text-end">
+            {% if r.statut == StatutReservation.EN_ATTENTE %}
+              {{ bouton_post(url_for('reservations.accepter', reservation_id=r.id), 'Accepter', 'success') }}
+              {{ bouton_post(url_for('reservations.refuser', reservation_id=r.id), 'Refuser', 'outline-danger') }}
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table></div>
+  {% else %}
+    <p class="text-muted">Aucune demande pour le moment.</p>
+  {% endif %}
+{% endif %}
+{% endblock %}

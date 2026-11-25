@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block contenu %}
+<div class="p-5 mb-4 bg-white rounded-3 border">
+  <h1 class="display-6" style="color:#1F2A44;">Covoiturage Faculté</h1>
+  <p class="lead">Partagez vos trajets vers votre faculté : publiez un trajet ou réservez une place.</p>
+  <a class="btn btn-primary me-2" href="{{ url_for('trajets.recherche') }}">Rechercher un trajet</a>
+  {% if current_user.is_authenticated %}
+    <a class="btn btn-outline-primary" href="{{ url_for('trajets.nouveau') }}">Publier un trajet</a>
+  {% else %}
+    <a class="btn btn-outline-primary me-2" href="{{ url_for('auth.inscription') }}">Créer un compte</a>
+    <a class="btn btn-outline-secondary" href="{{ url_for('auth.connexion') }}">Se connecter</a>
+  {% endif %}
+</div>
+{% endblock %}

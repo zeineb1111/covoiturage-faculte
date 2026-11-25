@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block titre %}Inscription - Covoiturage Faculté{% endblock %}
+{% block contenu %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card"><div class="card-body">
+      <h2 class="h4 mb-3">Inscription</h2>
+      <form method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="row">
+          <div class="col-md-6 mb-3"><label class="form-label">Nom</label>
+            <input class="form-control" name="nom" required></div>
+          <div class="col-md-6 mb-3"><label class="form-label">Prénom</label>
+            <input class="form-control" name="prenom" required></div>
+        </div>
+        <div class="mb-3"><label class="form-label">Faculté</label>
+          <select class="form-select" name="faculte_id" required>
+            <option value="" selected disabled>Choisissez votre faculté</option>
+            {% for f in facultes %}
+              <option value="{{ f.id }}">{{ f }}</option>
+            {% endfor %}
+          </select></div>
+        <div class="mb-3"><label class="form-label">E-mail</label>
+          <input class="form-control" type="email" name="email" required></div>
+        <div class="mb-3"><label class="form-label">Téléphone (facultatif)</label>
+          <input class="form-control" name="telephone"></div>
+        <div class="mb-3"><label class="form-label">Mot de passe (8 caractères minimum)</label>
+          <input class="form-control" type="password" name="mot_de_passe" required minlength="8"></div>
+        <button class="btn btn-primary w-100" type="submit">Créer mon compte</button>
+      </form>
+    </div></div>
+  </div>
+</div>
+{% endblock %}

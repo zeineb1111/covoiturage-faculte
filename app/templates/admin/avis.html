@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% from "_macros.html" import bouton_post %}
+{% block titre %}Avis - Administration{% endblock %}
+{% block contenu %}
+<h1 class="h3 mb-3">Modérer les avis</h1>
+{% if avis %}
+<div class="table-responsive"><table class="table bg-white align-middle">
+  <thead><tr><th>Auteur</th><th>Destinataire</th><th>Note</th><th>Commentaire</th><th></th></tr></thead>
+  <tbody>
+  {% for a in avis %}
+    <tr>
+      <td>{{ a.auteur.prenom }} {{ a.auteur.nom }}</td>
+      <td>{{ a.destinataire.prenom }} {{ a.destinataire.nom }}</td>
+      <td>{{ a.note }}/5</td>
+      <td>{{ a.commentaire or '-' }}</td>
+      <td class="text-end">{{ bouton_post(url_for('admin.supprimer_avis', avis_id=a.id), 'Supprimer', 'outline-danger', 'Supprimer cet avis ?') }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table></div>
+{% else %}
+  <div class="alert alert-info">Aucun avis pour le moment.</div>
+{% endif %}
+{% endblock %}

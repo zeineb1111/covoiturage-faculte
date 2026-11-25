@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% from "_macros.html" import badge_trajet %}
+{% block titre %}Rechercher un trajet - Covoiturage Faculté{% endblock %}
+{% block contenu %}
+<h1 class="h3 mb-3">Rechercher un trajet</h1>
+
+<form method="get" class="card card-body mb-4">
+  <div class="row g-3">
+    <div class="col-md-4">
+      <label class="form-label">Faculté de destination</label>
+      <select class="form-select" name="faculte_id">
+        <option value="">Toutes les facultés</option>
+        {% for f in facultes %}
+          <option value="{{ f.id }}" {% if f.id == faculte_id %}selected{% endif %}>{{ f }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">Zone de départ</label>
+      <input class="form-control" name="zone" value="{{ zone }}" placeholder="ex. El Mourouj">
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">Date</label>
+      <input class="form-control" type="date" name="date" value="{{ date_texte }}">
+    </div>
+    <div class="col-md-2 d-flex align-items-end">
+      <button class="btn btn-primary w-100" type="submit">Rechercher</button>
+    </div>
+  </div>
+</form>
+
+{% if trajets %}
+  <div class="row g-3">
+    {% for t in trajets %}
+      <div class="col-md-6">
+        <div class="card h-100"><div class="card-body">
+          <h2 class="h5">{{ t.zone_depart }} &rarr; {{ t.faculte.sigle or t.faculte.nom }}</h2>
+          <p class="mb-1">{{ t.date_depart.strftime('%d/%m/%Y') }} à {{ t.heure_depart.strftime('%H:%M') }}</p>
+          <p class="mb-1">Conducteur : {{ t.conducteur.prenom }} {{ t.conducteur.nom[:1] }}.
+            {% if t.conducteur.note_moyenne() %}<span class="badge text-bg-info">&#9733; {{ t.conducteur.note_moyenne() }}</span>{% endif %}</p>
+          <p class="mb-2">
+            <strong>{{ '%.2f'|format(t.prix) }} DT</strong> &middot;
+            {{ t.places_restantes() }} place(s) restante(s) sur {{ t.places_total }}
+          </p>
+          <a class="btn btn-outline-primary btn-sm" href="{{ url_for('trajets.detail', trajet_id=t.id) }}">Voir le trajet</a>
+        </div></div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="alert alert-info">Aucun trajet ne correspond à votre recherche. Essayez une autre zone ou une autre date.</div>
+{% endif %}
+{% endblock %}

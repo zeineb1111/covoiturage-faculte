@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% from "_macros.html" import badge_trajet, bouton_post %}
+{% block titre %}Trajets - Administration{% endblock %}
+{% block contenu %}
+<h1 class="h3 mb-3">Modérer les trajets</h1>
+<div class="table-responsive"><table class="table bg-white align-middle">
+  <thead><tr><th>Trajet</th><th>Conducteur</th><th>Départ</th><th>Statut</th><th></th></tr></thead>
+  <tbody>
+  {% for t in trajets %}
+    <tr>
+      <td><a href="{{ url_for('trajets.detail', trajet_id=t.id) }}">{{ t.zone_depart }} &rarr; {{ t.faculte.sigle or t.faculte.nom }}</a></td>
+      <td>{{ t.conducteur.prenom }} {{ t.conducteur.nom }}</td>
+      <td>{{ t.date_depart.strftime('%d/%m/%Y') }} {{ t.heure_depart.strftime('%H:%M') }}</td>
+      <td>{{ badge_trajet(t.statut) }}</td>
+      <td class="text-end">
+        {% if t.statut.name != 'ANNULE' %}
+          {{ bouton_post(url_for('admin.retirer_trajet', trajet_id=t.id), 'Retirer', 'outline-danger',
+                         'Retirer ce trajet de la plateforme ?') }}
+        {% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table></div>
+{% endblock %}

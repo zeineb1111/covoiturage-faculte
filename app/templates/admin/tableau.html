@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block titre %}Administration - Covoiturage Faculté{% endblock %}
+{% block contenu %}
+<h1 class="h3 mb-3">Administration</h1>
+<div class="row g-3 mb-4">
+  {% for libelle, valeur in [('Utilisateurs', stats.utilisateurs), ('Facultés', stats.facultes),
+                              ('Trajets ouverts', stats.trajets_ouverts), ('Réservations', stats.reservations), ('Avis', stats.avis)] %}
+    <div class="col-6 col-md-2"><div class="card text-center"><div class="card-body">
+      <div class="display-6">{{ valeur }}</div><div class="text-muted">{{ libelle }}</div>
+    </div></div></div>
+  {% endfor %}
+</div>
+<div class="list-group">
+  <a class="list-group-item list-group-item-action" href="{{ url_for('admin.utilisateurs') }}">Gérer les comptes</a>
+  <a class="list-group-item list-group-item-action" href="{{ url_for('admin.facultes') }}">Gérer les facultés</a>
+  <a class="list-group-item list-group-item-action" href="{{ url_for('admin.trajets') }}">Modérer les trajets</a>
+  <a class="list-group-item list-group-item-action" href="{{ url_for('admin.avis') }}">Modérer les avis</a>
+</div>
+{% endblock %}

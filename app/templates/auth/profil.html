@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block titre %}Mon profil - Covoiturage Faculté{% endblock %}
+{% block contenu %}
+<div class="row justify-content-center"><div class="col-md-6">
+  <div class="card"><div class="card-body">
+    <h1 class="h4 mb-1">Mon profil</h1>
+    <p class="text-muted">{{ current_user.email }}
+      {% if current_user.note_moyenne() %} &middot; Note moyenne : &#9733; {{ current_user.note_moyenne() }}/5{% endif %}</p>
+    <form method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="row">
+        <div class="col-md-6 mb-3"><label class="form-label">Nom</label>
+          <input class="form-control" name="nom" value="{{ current_user.nom }}" required></div>
+        <div class="col-md-6 mb-3"><label class="form-label">Prénom</label>
+          <input class="form-control" name="prenom" value="{{ current_user.prenom }}" required></div>
+      </div>
+      <div class="mb-3"><label class="form-label">Téléphone</label>
+        <input class="form-control" name="telephone" value="{{ current_user.telephone or '' }}"></div>
+      {% if not current_user.est_admin %}
+      <div class="mb-3"><label class="form-label">Faculté</label>
+        <select class="form-select" name="faculte_id" required>
+          {% for f in facultes %}
+            <option value="{{ f.id }}" {% if f.id == current_user.faculte_id %}selected{% endif %}>{{ f }}</option>
+          {% endfor %}
+        </select></div>
+      {% endif %}
+      <hr>
+      <p class="text-muted mb-2">Changer le mot de passe (laisser vide pour le conserver)</p>
+      <div class="mb-3"><label class="form-label">Ancien mot de passe</label>
+        <input class="form-control" type="password" name="ancien_mot_de_passe"></div>
+      <div class="mb-3"><label class="form-label">Nouveau mot de passe (8 caractères minimum)</label>
+        <input class="form-control" type="password" name="nouveau_mot_de_passe"></div>
+      <button class="btn btn-primary" type="submit">Enregistrer</button>
+    </form>
+  </div></div>
+</div></div>
+{% endblock %}

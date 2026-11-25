@@ -1,0 +1,14 @@
+# Environnement virtuel et fichiers Python générés
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# Base de données locale et configuration privée
+instance/
+*.db
+.env
+
+# Fichiers d'éditeur
+.vscode/
+.idea/
